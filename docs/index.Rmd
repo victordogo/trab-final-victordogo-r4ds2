@@ -168,15 +168,14 @@ metallica |>
 
 ```
 
-Santa correria! Será que, com o passar do tempo, o ritmo continuou o mesmo ou os membros da banda se cansaram e preferiram ficar mais numa boa? A razão dias/show ao longo dos anos de carreira da banda é um bom indicador dessa questão:
+Santa correria! Será que, com o passar do tempo, o ritmo continuou o mesmo ou os membros da banda se cansaram e preferiram ficar mais numa boa? A razão dias/show ao longo dos anos de carreira da banda é um bom indicador dessa questão. Iremos analisá-la de acordo com cada turnê e com cada ano:
 
 ```{r}
-# Gráfico da razão shows/dia
+# Gráfico da razão dias/show por ano
 
 metallica |>
   dplyr::group_by(Year) |> 
-  dplyr::summarise(days_show_ratio = (max(Date)-min(Date))/dplyr::n(),
-                   begin=min(Date)) |> 
+  dplyr::summarise(days_show_ratio = (max(Date)-min(Date))/dplyr::n()) |> 
   dplyr::arrange(Year) |> 
   ggplot2::ggplot(ggplot2::aes(x = Year, y = as.numeric(days_show_ratio)))+
   ggplot2::geom_line()+
@@ -186,3 +185,41 @@ metallica |>
 
 ```
 
+```{r}
+# Tabela das 5 turnês com menor razão dias/show por turnê
+
+mais_corrida <- metallica |> 
+  dplyr::filter(Tour!="None") |> 
+  dplyr::group_by(Tour) |> 
+  dplyr::summarise(`Razão Dias/Show`= round(
+    (max(Date)-min(Date))/dplyr::n(),digits=2
+  )) |> 
+  dplyr::arrange(`Razão Dias/Show`) |>
+  dplyr::top_n(-5) |> 
+  gt::gt() |> 
+  gt::as_raw_html()
+
+# Tabela das 5 turnês com maior razão dias/show por turnê
+
+menos_corrida <- metallica |> 
+  dplyr::filter(Tour!="None") |> 
+  dplyr::group_by(Tour) |> 
+  dplyr::summarise(`Razão Dias/Show`= round(
+    (max(Date)-min(Date))/dplyr::n(),digits=2
+  )) |> 
+  dplyr::arrange(desc(`Razão Dias/Show`)) |>
+  dplyr::top_n(5) |> 
+  gt::gt() |> 
+  gt::as_raw_html()
+
+data.frame(menos_corrida, mais_corrida) |> 
+  gt::gt() |> 
+  gt::fmt_markdown(columns = dplyr::everything()) |> 
+  gt::cols_label(menos_corrida = "Top 5 Turnês menos 'corridas'",
+                 mais_corrida = "Top 5 Turnês mais 'corridas'") |> 
+  gt::tab_header(
+    title = gt::md("Turnês mais e menos 'corridas' da banda Metallica"),
+    subtitle = gt::md("O ritmo mais pesado chegou a um show para cada 1,18 dias; o mais leve foi de um show para cada 9,78 dias")
+  )
+
+```
