@@ -1,0 +1,88 @@
+---
+title: "Metallica: Do Show de Garagem para o Mundo"
+subtitle: "Trabalho de Conclusão do curso 'R para Ciência de Dados 2'"
+author: "Victor Alves Dogo Martins"
+date: "Atualizado pela última vez em `r format(Sys.Date(), '%d/%m/%y')`."
+output: 
+  rmdformats::robobook:
+    code_folding: hide
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE)
+```
+
+# Introdução
+
+A banda Metallica surgiu no comecinho dos anos 80, inspirando-se na Nova Onda do Heavy Metal Britânico, uma corrente surgida anos antes e que compreende bandas como Iron Maiden, Judas Priest, Venom, Def Leppard, Motorhead e tantas outros nomes que, se você não estiver habituade, vão parecer mais nomes de Pokémon do que qualquer outra coisa. Mas o ponto não é esse!
+
+Desde que surgiu, a banda revolucionou a música e deu base para todo um gênero, fazendo diversas turnês pelo mundo e sendo o [único conjunto/artista a ter tocado em todos os 7 continentes do mundo.](http://g1.globo.com/musica/noticia/2013/12/metallica-toca-abaixo-de-zero-em-show-inusitado-na-antartida.html). 
+
+Com tantos anos de estrada, é da curiosidade de alguém (como nós, estatísticos e cientistas de dados talvez) compreender em números como foram essas turnês, em que locais seus shows ocorreram e outras características de interesse. Sem mais delongas, vamos ao trabalho!
+
+# O Banco de Dados
+
+O banco de dados utilizado para este trabalho encontra-se disponível no Kaggle, e chama-se [Metallica Tour History](https://www.kaggle.com/kitsamho/metallica-tour-history). A base, após a limpeza, consiste em 23 atributos de 2070 shows feitos pela banda ao longo do tempo. As variáveis presentes são:
+
+* **Date:** Data do show no formato "aaaa-mm-dd";
+* **Festival:** Festival onde o show ocorreu, se houver;
+* **Tour:** Turnê onde o show ocorreu, se houver;
+* **Country:** País onde o show ocorreu;
+* **Set:** Setlist principal do show, concatenado uma string dividida por vírgulas;
+* **Encores:** Músicas extras do show, ou seja, músicas que não estavam na setlist mas foram tocadas ao final do show;
+* **Set_Length:** Número de músicas da setlist;
+* **Disco_Count:** Número de músicas de determinado disco tocadas no show.
+
+Falando em discos, é interessante apresentarmos quais discos a banda lançou ao longo dos anos para aqueles que nunca ouviram falar dela. Eles estão apresentados à seguir:
+
+```{r}
+# Definindo pasta de trabalho para a principal, e não a docs/
+setwd("..")
+
+# Criando tabela com discos, capa e ano de lançamento
+
+dplyr::tibble(
+  Disco=c("Kill'Em All", "Ride the Lightning", "Master of Puppets",
+            "...And Justice For All", "Black Album", "Load", "ReLoad",
+            "Garage Inc.", "St. Anger", "Death Magnetic",
+            "Hardwired To Self Destruct"),
+  Capa=c("img/1-kill.jpg","img/2-ride.jpg","img/3-master.jpg",
+         "img/4-justice.jpg","img/5-black.jpg","img/6-load.jpg",
+         "img/7-reload.jpg", "img/8-garage.jpg","img/9-anger.jpg",
+         "img/10-death.jpg","img/11-hardwired.jpg"),
+  Ano=c(1983, 1984, 1986, 1988, 1991, 1996, 1997, 1998, 2003, 2008, 2016)
+) |> 
+  gt::gt() |> 
+  gt::tab_header(
+    title = gt::md("**Discografia do Metallica**"),
+    subtitle = gt::md("A banda começou seus anos mais revoltados com 'Kill`Em All', chegando até o mais recente 'Hardwired To Self Destruct'") 
+  ) |> 
+  gt::text_transform(
+    locations = gt::cells_body(Capa),
+    fn = function(x){
+      purrr::map_chr(x, ~ gt::local_image(
+        filename = .x,
+        height = 75
+      ))
+    }
+  )
+  
+  
+
+```
+
+Sem mais delongas, vamos ao trabalho!
+
+# Perguntas de interesse
+
+Antes de partirmos para as análises propriamente ditas, existem algumas perguntas que podem nos auxiliar a descrever o comportamento da banda ao longo dos anos no que diz respeito às suas turnês, shows e afins:
+
+1. Quais foram as turnês com mais shows? Quando ocorreram? Qual o tamanho médio dos shows da turnê? Quais turnês duraram mais tempo?
+2. Em quais países a banda fez mais shows?
+3. Qual disco foi o mais tocado pela banda?
+4. Quais foram as músicas mais tocadas pela banda?
