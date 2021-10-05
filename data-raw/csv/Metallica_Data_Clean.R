@@ -4,7 +4,7 @@ metallica <- readr::read_csv("data-raw/csv/Metallica_Data_Clean.csv") |>
   # Selecting columns of interest
   dplyr::select(Date, Festival, City_Country,
                 Tour, Set, Encores, Set_Length,
-                Has_Guitar_Solo:Hardwired_To_Self_Destruct_Count) |>
+                `Kill_'Em_All_Count`:Hardwired_To_Self_Destruct_Count) |>
   # Extracting country from City_Country by splitting string and taking
   # last element using purrr and stringr
   dplyr::mutate(
@@ -19,7 +19,11 @@ metallica <- readr::read_csv("data-raw/csv/Metallica_Data_Clean.csv") |>
                 Festival = stringr::str_replace_all(Festival, "NA", "None"),
                 Tour = stringr::str_replace_na(Tour),
                 Tour = stringr::str_replace_all(Tour, "NA", "None"),
-                Date=lubridate::mdy(data))
+                Date=lubridate::mdy(Date)) |>
+  # Replacing Date with Year column
+  dplyr::mutate(Year=lubridate::year(Date),
+                .before=Festival)
 
+# Saving dataset
 metallica |>
   readr::write_rds("data/metallica.rds")
