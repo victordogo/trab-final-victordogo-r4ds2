@@ -30,6 +30,7 @@ Com tantos anos de estrada, é da curiosidade de alguém (como nós, estatístic
 O banco de dados utilizado para este trabalho encontra-se disponível no Kaggle, e chama-se [Metallica Tour History](https://www.kaggle.com/kitsamho/metallica-tour-history). A base, após a limpeza, consiste em 23 atributos de 2070 shows feitos pela banda ao longo do tempo. As variáveis presentes são:
 
 * **Date:** Data do show no formato "aaaa-mm-dd";
+* **Year:** Ano de ocorrência do show;
 * **Festival:** Festival onde o show ocorreu, se houver;
 * **Tour:** Turnê onde o show ocorreu, se houver;
 * **Country:** País onde o show ocorreu;
@@ -43,6 +44,10 @@ Falando em discos, é interessante apresentarmos quais discos a banda lançou ao
 ```{r}
 # Definindo pasta de trabalho para a principal, e não a docs/
 setwd("..")
+
+# Lendo banco de dados
+
+metallica <- readRDS("data/metallica.rds")
 
 # Criando tabela com discos, capa e ano de lançamento
 
@@ -86,3 +91,98 @@ Antes de partirmos para as análises propriamente ditas, existem algumas pergunt
 2. Em quais países a banda fez mais shows?
 3. Qual disco foi o mais tocado pela banda?
 4. Quais foram as músicas mais tocadas pela banda?
+
+As seções desta análise estão divididas de maneira a cobrir essas questões de uma maneira mais conveniente:
+
+# Análise dos Dados
+
+## Turnês
+
+No banco de dados em estudo, temos turnês registradas até o ano de 2018; ao todo, são 30 turnês (sem contarmos os shows que não fizeram parte de nenhum itinerário desse tipo):
+
+```{r}
+# Tabela de todas as turnês
+
+metallica |> 
+  dplyr::filter(Tour!="None") |> 
+  dplyr::group_by(Tour) |> 
+  dplyr::summarise(`Data de Início:`=min(Date),
+                   `Data de Término`=max(Date)) |> 
+  dplyr::arrange(`Data de Início:`) |> 
+  gt::gt() |> 
+  gt::tab_header(
+    title=gt::md("**Lista de Turnês da banda Metallica**"),
+    subtitle=gt::md("A primeira ocorreu no ano de 1983 para a divulgação de seu disco de estréia")
+  ) |> 
+  gt::tab_footnote(
+    footnote = gt::md("Dados registrados até o ano de 2018; a turnê 'WorldWired' ainda está ocorrendo"),
+    locations = gt::cells_column_labels(
+      columns= Tour
+    )
+  ) |> 
+  gt::tab_options(
+    container.height = 500
+  )
+
+```
+
+Tendo em mente as 30 turnês apresentadas, é interessante pensarmos em quais delas possuem/possuíram maior duração. Ordenadas da maior para a menor turnê, no quesito duração em dias, temos que as 5 mais extensas foram:
+
+```{r}
+
+# Tabela das top 5 turnes por duração em dias
+
+metallica |> 
+  dplyr::filter(Tour!="None") |> 
+  dplyr::group_by(Tour) |> 
+  dplyr::summarise(`Duração em dias`=max(Date)-min(Date)) |> 
+  dplyr::arrange(desc(`Duração em dias`)) |> 
+  dplyr::top_n(5) |> 
+  gt::gt() |> 
+  gt::tab_header(
+    title=gt::md("**Top 5 turnês mais duradouras da banda Metallica**"),
+    subtitle=gt::md("A turnê 'WorldWired' tem tudo para bater ainda mais recordes, dito que ainda está ocorrendo no presente ano de 2021")
+  ) 
+
+```
+
+Outro destaque interessante vai para a turnê "Wherever We May Roam", ocorrida no início da década de 90 e tida como um dos pontos altos da banda, apenas superada recentemente pelas turnês "World Magnetic" e "WorldWired".
+
+Mas beleza, de nada adianta analisarmos única e exclusivamente a duração de uma turnê pela sua quantidade de dias, mas sim pela quantidade de shows e a quantidade média de dias entre cada show. É o que faremos agora:
+
+
+```{r}
+# Tabela das top 5 turnês por quantidade de shows
+
+metallica |> 
+  dplyr::filter(Tour!="None") |> 
+  dplyr::group_by(Tour) |> 
+  dplyr::summarise(`Quantidade de Shows`= dplyr::n()) |> 
+  dplyr::arrange(desc(`Quantidade de Shows`)) |> 
+  dplyr::top_n(5) |> 
+  gt::gt() |> 
+  gt::tab_header(
+    title=gt::md("**Top 5 turnês com mais shows da banda Metallica**"),
+    subtitle=gt::md("A lendária 'Wherever We May Roam' foi a maior de todas, com 229 shows")
+  ) 
+
+```
+
+Santa correria! Será que, com o passar do tempo, o ritmo continuou o mesmo ou os membros da banda se cansaram e preferiram ficar mais numa boa? A razão dias/show ao longo dos anos de carreira da banda é um bom indicador dessa questão:
+
+```{r}
+# Gráfico da razão shows/dia
+
+metallica |>
+  dplyr::group_by(Year) |> 
+  dplyr::summarise(days_show_ratio = (max(Date)-min(Date))/dplyr::n(),
+                   begin=min(Date)) |> 
+  dplyr::arrange(Year) |> 
+  ggplot2::ggplot(ggplot2::aes(x = Year, y = as.numeric(days_show_ratio)))+
+  ggplot2::geom_line()+
+  ggplot2::labs(x = "Ano",y = "Média de Dias entre Shows",
+                title="Quantidade Média de Dias entre Shows ao longo dos anos",
+                subtitle="O ano com os shows mais espaçados, no geral, foi o de 1995")
+
+```
+
