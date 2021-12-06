@@ -203,7 +203,7 @@ data.frame(menos_corrida, mais_corrida) |>
   gt::cols_label(menos_corrida = "Top 5 Turnês menos 'corridas'",
                  mais_corrida = "Top 5 Turnês mais 'corridas'") |> 
   gt::tab_header(
-    title = gt::md("Turnês mais e menos 'corridas' da banda Metallica"),
+    title = gt::md("**Turnês mais e menos 'corridas' da banda Metallica**"),
     subtitle = gt::md("O ritmo mais pesado chegou a um show para cada 1,18 dias; o mais leve foi de um show para cada 9,78 dias")
   )
 
@@ -236,4 +236,43 @@ razao_por_anos |> plotly::ggplotly()
 
 ```
 
-Por fim, no que diz respeito às turnês, quais foram as com a maior quantidade média de músicas por set? E qual ano possui a maior quantidade de 
+O ano de 1995 foi o mais tranquilo para a banda no que diz respeito à quantidade de shows: em média, rolou apenas um show a cada 20 dias! O mais atarefado, no entanto, foi o ano de 2005, quando a banda possuiu a média próxima de um show por dia.
+
+Por fim quais foram as turnês com a maior quantidade média de músicas por set? E qual ano possui essa mesma quantidade média?
+
+```{r}
+# Tabela das 5 turnês com menor media musicas/show
+
+menor_sets <- metallica |> 
+  dplyr::filter(Tour!="None") |> 
+  dplyr::group_by(Tour) |> 
+  dplyr::summarise(`Média Músicas/Show`= round(
+    mean(Set_Length),digits=2
+  )) |> 
+  dplyr::arrange(`Média Músicas/Show`) |>
+  dplyr::top_n(-5) |> 
+  gt::gt() |> 
+  gt::as_raw_html()
+
+maior_sets <- metallica |> 
+  dplyr::filter(Tour!="None") |> 
+  dplyr::group_by(Tour) |> 
+  dplyr::summarise(`Média Músicas/Show`= round(
+    mean(Set_Length),digits=2
+  )) |> 
+  dplyr::arrange(desc(`Média Músicas/Show`)) |>
+  dplyr::top_n(5) |> 
+  gt::gt() |> 
+  gt::as_raw_html()
+
+data.frame(menor_sets, maior_sets) |> 
+  gt::gt() |> 
+  gt::fmt_markdown(columns = dplyr::everything()) |> 
+  gt::cols_label(menor_sets = "Top 5 Turnês com menores sets",
+                 maior_sets= "Top 5 Turnês com maiores sets") |> 
+  gt::tab_header(
+    title = gt::md("**Turnês com maior e menor quantidade média de músicas por set**"),
+    subtitle = gt::md("A turnê com maiores sets possuiu média de 22.46 músicas; a menor, média de 10.17.")
+  )
+
+```
