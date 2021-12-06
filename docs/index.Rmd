@@ -387,7 +387,49 @@ Agora ficou muito melhor: se não considerarmos os EUA e Canadá, temos que a Al
 
 ### Discos
 
-### Músicas
+Como vimos no início deste humilde trabalho, a banda Metallica possui 11 álbuns de estúdio (pelo menos até o ano de 2021). Destes álbuns, qual deles será o mais pedido pelos fãs (ou simplesmente o favorito da banda)? Por sorte, o banco de dados já nos fornece uma métrica que torna fácil a tarefa de encontrarmos essa resposta:
 
-# Conclusão
+```{r}
+## Discos mais tocados
+
+# Definindo tabela com resultados
+
+qtd_tocada <- dplyr::tibble(
+  disco=c("Kill'Em All", "Ride the Lightning", "Master of Puppets",
+            "...And Justice For All", "Black Album", "Load", "ReLoad",
+            "Garage Inc.", "St. Anger", "Death Magnetic",
+            "Hardwired To Self Destruct"),
+  capa=c("img/1-kill.jpg","img/2-ride.jpg","img/3-master.jpg",
+         "img/4-justice.jpg","img/5-black.jpg","img/6-load.jpg",
+         "img/7-reload.jpg", "img/8-garage.jpg","img/9-anger.jpg",
+         "img/10-death.jpg","img/11-hardwired.jpg"),
+  plays=purrr::map_dbl(metallica[,9:19], sum, na.rm=TRUE)
+)
+
+# Apresentando tabela
+
+qtd_tocada |> 
+  dplyr::arrange(dplyr::desc(plays)) |> 
+  gt::gt() |> 
+  gt::tab_header(
+    title = gt::md("**Discos mais tocados em shows do Metallica**"),
+    subtitle = gt::md("Para a surpresa de ninguém, o disco mais infame (St. Anger) também é o menos tocado") 
+  ) |> 
+  gt::cols_label(disco="Disco",capa="Capa", 
+                 plays="Vezes que foi tocado") |> 
+  gt::text_transform(
+    locations = gt::cells_body(capa),
+    fn = function(x){
+      purrr::map_chr(x, ~ gt::local_image(
+        filename = .x,
+        height = 75
+      ))
+    }
+  )
+
+```
+
+Curioso notarmos que os cinco discos mais tocados em shows são, justamente, os cinco discos da fase dita "clássica": ainda que existam ressalvas quanto ao Black Album, é inegável que estes contenham as músicas mais populares da banda. Depois deles, aparecem trabalhos de menor expressão como os injustiçados Load e ReLoad, com um destaque para o disco mais recente da banda (Hardwired) que só está na frente do St. Anger, álbum polêmico que este que vos fala se recusa a lembrar que existe.
+
+### Músicas
 
