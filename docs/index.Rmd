@@ -247,7 +247,7 @@ menor_sets <- metallica |>
   dplyr::filter(Tour!="None") |> 
   dplyr::group_by(Tour) |> 
   dplyr::summarise(`Média Músicas/Show`= round(
-    mean(Set_Length),digits=2
+    mean(Set_Length,na.rm=TRUE),digits=2
   )) |> 
   dplyr::arrange(`Média Músicas/Show`) |>
   dplyr::top_n(-5) |> 
@@ -258,7 +258,7 @@ maior_sets <- metallica |>
   dplyr::filter(Tour!="None") |> 
   dplyr::group_by(Tour) |> 
   dplyr::summarise(`Média Músicas/Show`= round(
-    mean(Set_Length),digits=2
+    mean(Set_Length,na.rm=TRUE),digits=2
   )) |> 
   dplyr::arrange(desc(`Média Músicas/Show`)) |>
   dplyr::top_n(5) |> 
@@ -276,3 +276,32 @@ data.frame(menor_sets, maior_sets) |>
   )
 
 ```
+
+A turnê com menor média de músicas em seus sets foi a Seven Dates of Hell (10.17 músicas por show), seguida pela Kill'Em All for One (10.5 músicas por show) e outras. Estas duas merecem destaque por serem algumas das primeiras turnês da banda, quando sequer haviam músicas para serem tocadas.
+
+Por outro lado, a com maior média de músicas por set foi a turnê Nowhere Else to Roam (22.46 músicas por show), que ocorreu na época em que a banda teve seu maior boom em popularidade (algo próximo do início da década de 90, para sermos mais exatos), quando já possuíam um certo tempo de estrada e mais discos na bagagem.
+
+
+```{r}
+# Grafico da razao dias/show através dos anos
+
+musicas_por_anos <- metallica |>
+  dplyr::mutate(Ano=Year) |>
+  dplyr::group_by(Ano) |>
+  dplyr::summarise(`Média Músicas/Show`= round(
+    mean(Set_Length,na.rm=TRUE),digits=2
+  )) |>
+  ggplot2::ggplot(ggplot2::aes(x=Ano,y=`Média Músicas/Show`))+
+  ggplot2::geom_line()+
+  ggplot2::theme_minimal()+
+  ggplot2::scale_x_continuous(breaks = seq(1980,2018,5))+
+  ggplot2::labs(x="Ano",y="Média Músicas/Show",
+                title="Média de músicas por show através dos anos")
+
+musicas_por_anos |> plotly::ggplotly()
+
+```
+
+Aqui, observamos resultados parecidos: o ano de 1982 (primeiro ano de vida da banda) possuiu a menor média de músicas por show (8.85), isso provavelmente pelo fato da banda sequer ter lançado seu primeiro disco; o ano de 1993, coincidindo com a turnê Nowhere Else to Roam, possuiu a maior média (21.59 músicas por show). A partir do ano de 2006, a banda pareceu estabilizar essas métricas, sem shows muito pequenos ou muito grandes na média.
+
+## Ao Redor do Mundo
