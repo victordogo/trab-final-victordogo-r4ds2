@@ -171,21 +171,6 @@ metallica |>
 Santa correria! Será que, com o passar do tempo, o ritmo continuou o mesmo ou os membros da banda se cansaram e preferiram ficar mais numa boa? A razão dias/show ao longo dos anos de carreira da banda é um bom indicador dessa questão. Iremos analisá-la de acordo com cada turnê e com cada ano:
 
 ```{r}
-# Gráfico da razão dias/show por ano
-
-metallica |>
-  dplyr::group_by(Year) |> 
-  dplyr::summarise(days_show_ratio = (max(Date)-min(Date))/dplyr::n()) |> 
-  dplyr::arrange(Year) |> 
-  ggplot2::ggplot(ggplot2::aes(x = Year, y = as.numeric(days_show_ratio)))+
-  ggplot2::geom_line()+
-  ggplot2::labs(x = "Ano",y = "Média de Dias entre Shows",
-                title="Quantidade Média de Dias entre Shows ao longo dos anos",
-                subtitle="O ano com os shows mais espaçados, no geral, foi o de 1995")
-
-```
-
-```{r}
 # Tabela das 5 turnês com menor razão dias/show por turnê
 
 mais_corrida <- metallica |> 
@@ -223,3 +208,32 @@ data.frame(menos_corrida, mais_corrida) |>
   )
 
 ```
+
+
+No geral, as turnês Hell On Earth Tour e Kill'Em All for One foram as mais corridas para a banda no geral, com uma média de um show a cada 1.2 dias! Por coincidência, essas duas turnês aconteceram no início da década de 80, quando a banda estava na sua época mais jovem e, provavelmente, mais disposta.
+
+Por outro lado, quase todas as turnês mais tranquilas da banda fazem parte de épocas mais recentes, como é o caso da WorldWired e da Metallica By Request. Um destaque vai para a turnê Blitzkrieg '97, com aproximadamente um show a cada 10 dias.
+
+E quando à razão dias/show para cada ano?
+
+```{r}
+# Grafico da razao dias/show através dos anos
+
+razao_por_anos <- metallica |>
+  dplyr::mutate(Ano=Year) |>
+  dplyr::group_by(Ano) |>
+  dplyr::summarise(razao= round(
+    (max(Date)-min(Date))/dplyr::n(),digits=2
+  )) |>
+  ggplot2::ggplot(ggplot2::aes(x=Ano,y=razao))+
+  ggplot2::geom_line()+
+  ggplot2::theme_minimal()+
+  ggplot2::scale_x_continuous(breaks = seq(1980,2018,5))+
+  ggplot2::labs(x="Ano",y="Razão",
+                title="Razão Dias/Show através dos anos")
+
+razao_por_anos |> plotly::ggplotly()
+
+```
+
+Por fim, no que diz respeito às turnês, quais foram as com a maior quantidade média de músicas por set? E qual ano possui a maior quantidade de 
