@@ -305,3 +305,89 @@ musicas_por_anos |> plotly::ggplotly()
 Aqui, observamos resultados parecidos: o ano de 1982 (primeiro ano de vida da banda) possuiu a menor média de músicas por show (8.85), isso provavelmente pelo fato da banda sequer ter lançado seu primeiro disco; o ano de 1993, coincidindo com a turnê Nowhere Else to Roam, possuiu a maior média (21.59 músicas por show). A partir do ano de 2006, a banda pareceu estabilizar essas métricas, sem shows muito pequenos ou muito grandes na média.
 
 ## Ao Redor do Mundo
+
+### Breve explicação do código
+
+Para esta seção, foi utilizada a função `ggplot2::geom_map()` para plotarmos um gráfico com o número de shows dividido por cada país no mapa mundi. Para que esse processo funcionasse, no entanto, foi necessário criarmos um data frame com duas colunas: na primeira, o país; na segunda, o número de shows da banda Metallica que esse país já recebeu. Isso incluiu países com 0 shows, como podem ver abaixo:
+
+```{r}
+### Ao redor do mundo
+
+# Definindo mapa mundi
+mapa_mundo <- ggplot2::map_data("world")
+
+# Definindo operador not in
+`%notin%` <- Negate(`%in%`)
+
+# Países com shows do metallica
+data_sim <- metallica |> 
+  dplyr::group_by(Country) |> 
+  dplyr::summarise(n_shows=dplyr::n())
+
+# Países sem shows do metallica
+data_nao <- tidyr::tibble(
+  Country=unique(mapa_mundo$region),
+  n_shows=numeric(length(unique(mapa_mundo$region)))
+) |> 
+  dplyr::filter(Country %notin% data_sim$Country)
+
+# Juntando os dois bancos
+
+data_mundo <- dplyr::bind_rows(data_sim,data_nao)
+
+```
+
+O resultado foi um objeto que tornasse possível a plotagem do gráfico do mapa mundi com os dados necessários.
+
+### Resultado
+
+```{r}
+# Shows ao redor do mundo
+
+data_mundo |>
+  ggplot2::ggplot(ggplot2::aes(map_id=Country))+
+  ggplot2::geom_map(ggplot2::aes(fill=n_shows),
+                    map=mapa_mundo)+
+  ggplot2::expand_limits(x=mapa_mundo$long,y=mapa_mundo$lat)+
+  ggplot2::coord_map("mercator",xlim=c(-180,180))+
+  ggplot2::scale_fill_viridis_c()+
+  ggplot2::labs(fill="Número de Shows",
+                title="Número de Shows do Metallica \ndivididos por País")+
+  ggplot2::theme_void()
+
+```
+
+Acima, podemos ver que os EUA receberam a esmagadora maioria dos shows da banda, com outra parte destes ocorrendo no Canadá ou Europa. Para facilitar a visualização destes outros locais, convém plotarmos um gráfico retirando os dados dos países com maior destaque:
+
+```{r}
+# Shows ao redor do mundo (sem EUA e Canada)
+
+data_mundo |>
+  dplyr::mutate(
+    n_shows=ifelse(Country %in% c("USA","Canada"),
+                   0,
+                   n_shows)
+  ) |> 
+  ggplot2::ggplot(ggplot2::aes(map_id=Country))+
+  ggplot2::geom_map(ggplot2::aes(fill=n_shows),
+                    map=mapa_mundo)+
+  ggplot2::expand_limits(x=mapa_mundo$long,y=mapa_mundo$lat)+
+  ggplot2::coord_map("mercator",xlim=c(-180,180))+
+  ggplot2::scale_fill_viridis_c()+
+  ggplot2::labs(fill="Número de Shows",
+                title="Número de Shows do Metallica \ndivididos por País*",
+                subtitle = "*Sem EUA e Canadá")+
+  ggplot2::theme_void()
+
+```
+
+Agora ficou muito melhor: se não considerarmos os EUA e Canadá, temos que a Alemanha recebeu destaque nos shows realizados pela banda ao longo de sua carreira. Outros países que merecem uma menção honrosa são o Reino Unido, França e Austrália. Nosso Brasil, coitado, pareceu receber número pouco maior do que Rússia, estando relativamente próximo do número de shows no Méximo, por exemplo.
+
+## As mais tocadas
+
+### Discos
+
+### Músicas
+
+# Conclusão
+
