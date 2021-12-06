@@ -12,6 +12,32 @@ metallica <- readr::read_csv("data-raw/csv/Metallica_Data_Clean.csv") |>
     stringr::str_split(City_Country,pattern = ","), .f=tail,n=1
   ),
   .keep="unused", .before=Set) |>
+  # Removing whitespace from country
+  dplyr::mutate(
+    Country=stringr::str_trim(Country)
+  ) |>
+  # Renaming Countries to work with map data
+  dplyr::mutate(
+    Country=replace(Country,
+                    Country %in% c("England", "Scotland",
+                                   "Northern Ireland", "Wales"),
+                    "UK")
+  ) |>
+  dplyr::mutate(
+    Country=replace(Country,
+                    Country=="Phillippines",
+                    "Philippines")
+  ) |>
+  dplyr::mutate(
+    Country=replace(Country,
+                    Country=="United States",
+                    "USA")
+  ) |>
+  dplyr::mutate(
+    Country=replace(Country,
+                    Country=="Hong Kong",
+                    "China")
+  ) |>
   # Replacing NA in Festival by "None"
   # Changing date format in Date column
   # Replacing NA in Tour by "None"
