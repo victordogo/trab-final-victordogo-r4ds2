@@ -2,7 +2,7 @@
 title: "Metallica: Do Show de Garagem para o Mundo"
 subtitle: "Trabalho de Conclusão do curso 'R para Ciência de Dados 2'"
 author: "Victor Alves Dogo Martins"
-date: "Atualizado pela última vez em `r format(Sys.Date(), '%d/%m/%y')`."
+date: "Atualizado pela última vez em `r format(Sys.Date(), '%d/%m/%y')` às `r format(Sys.time(), '%R')` BRT."
 output: 
   rmdformats::robobook:
     code_folding: hide
