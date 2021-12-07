@@ -467,17 +467,7 @@ musicas_tocadas <- dplyr::tibble(
   dplyr::arrange(dplyr::desc(n)) |> 
   tibble::rowid_to_column("Colocação")
 
-# Apresentando top 20 mais tocadas
-
-top_1_10 <- musicas_tocadas[1:10,] |>
-  as.data.frame() |> 
-  gt::gt() |> 
-  gt::as_raw_html()
-
-top_11_20 <- musicas_tocadas[11:20,] |>
-  as.data.frame() |> 
-  gt::gt() |> 
-  gt::as_raw_html()
+# Apresentando top 10 mais tocadas
 
 musicas_tocadas[1:10,] |>
   as.data.frame() |> 
