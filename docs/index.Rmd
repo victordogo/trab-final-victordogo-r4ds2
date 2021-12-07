@@ -433,3 +433,59 @@ Curioso notarmos que os cinco discos mais tocados em shows são, justamente, os 
 
 ### Músicas
 
+Em último lugar, mas não menos importante, é interessante sabermos quais são as músicas mais tocadas pela banda em shows; será um resultado similar aos discos mais tocados ou algumas músicas mais recentes também são populares? Para respondermos essa pergunta, foram calculadas as 10 músicas mais tocadas através de todos os sets e encores da banda:
+
+```{r}
+# Separando sets e encores em musicas individuais
+
+sets <- metallica |>
+  dplyr::select(Set) |>
+  stringr::str_split(pattern = ",") |>
+  unlist() |>
+  stringr::str_replace_all("[[:punct:]]", "") |>
+  stringr::str_trim()
+
+sets[1] <- "Hardwired"
+
+encores <- metallica |>
+  dplyr::select(Encores) |>
+  stringr::str_split(pattern = ",") |>
+  unlist() |>
+  stringr::str_replace_all("[[:punct:]]", "") |>
+  stringr::str_trim()
+
+encores[1] <- "Spit Out The Bone"
+
+# Tibble com numero de vezes que cada musica foi tocada
+
+musicas_tocadas <- dplyr::tibble(
+  `Música`=c(sets,encores)
+) |>
+  dplyr::group_by(`Música`) |> 
+  dplyr::count() |> 
+  dplyr::filter(`Música` %notin% c("Rise","")) |> 
+  dplyr::arrange(dplyr::desc(n)) |> 
+  tibble::rowid_to_column("Colocação")
+
+# Apresentando top 20 mais tocadas
+
+top_1_10 <- musicas_tocadas[1:10,] |>
+  as.data.frame() |> 
+  gt::gt() |> 
+  gt::as_raw_html()
+
+top_11_20 <- musicas_tocadas[11:20,] |>
+  as.data.frame() |> 
+  gt::gt() |> 
+  gt::as_raw_html()
+
+musicas_tocadas[1:10,] |>
+  as.data.frame() |> 
+  gt::gt() |> 
+  gt::cols_align("center") |> 
+  gt::tab_header(
+    title = gt::md("**Músicas mais tocadas em shows do Metallica**"),
+    subtitle = gt::md("Música velha é que faz um set bom?"))
+
+```
+
