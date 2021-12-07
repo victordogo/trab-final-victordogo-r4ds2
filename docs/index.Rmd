@@ -479,3 +479,22 @@ musicas_tocadas[1:10,] |>
 
 ```
 
+Acima, temos que **todas as músicas dentre as 10 mais tocadas em shows pertencem a, pelo menos, um dos cinco primeiros álbuns da banda**. A título de curiosidade, as mais recentes são Enter Sandman, Sad But True e Nothing Else Matters do "Black Album", lançado em 1991. Ainda que músicas mais recentes não sejam tão tocadas por terem menos tempo de existência, a diferença é gritante: sequer tivemos uma música de álbuns lançados após os anos 2000 figurando entre as mais populares.
+
+# Conclusão
+
+No que diz respeito às suas turnês:
+
+* A maior turnê do Metallica em dias de extensão é a WorldWired, e a em número de shows realizados é a Wherever We May Roam;
+* A turnê mais corrida de sua carreira foi a Hell On Earth Tour, e a menos corrida foi a BlitzKrieg '97 (da mesma forma, o ano mais "tranquilo" no geral foi 1995, enquanto que o menos tranquilo foi 2005);
+* A turnê com menor tamanho médio dos sets foi a Seven Dates of Hell, enquanto que a turnê com maior tamanho médio dos sets foi a Nowhere Else to Roam (da mesma forma, o ano com maior número médio de músicas por set foi 1993; o com menor foi 1982).
+
+Além disso, temos que a banda toca predominantemente em shows realizados na América do Norte ou Europa, com outros shows mais esparsos realizados na América Latina. 
+
+Também pudemos ver que seus álbuns e músicas mais tocados em shows foram lançados no início da carreira até 1991, no geral, com materiais lançados após esta época sendo menos populares.
+
+# Referências
+
+* O repositório desta análise pode ser verificado em [victordogo/trab-final-victordogo-r4ds2](https://github.com/victordogo/trab-final-victordogo-r4ds2) no GitHub;
+* O banco de dados utilizado foi o [Metallica Tour History](https://github.com/victordogo/trab-final-victordogo-r4ds2);
+* Demais informações da banda citadas neste trabalho estão disponíveis e explicadas à exaustão [na sua página da Wikipédia](https://pt.wikipedia.org/wiki/Metallica).
